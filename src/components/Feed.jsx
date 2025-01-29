@@ -26,7 +26,14 @@ const Feed = () => {
     getFeed();
   }, []);
 
-  if (feedData?.length === 0) return;
+  if (!feedData) return;
+
+  if (feedData.length <= 0)
+    return (
+      <h1 className="font-bold text-white justify-center flex my-10">
+        No more users found!
+      </h1>
+    );
 
   return (
     feedData && (
