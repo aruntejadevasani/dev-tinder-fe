@@ -2,36 +2,36 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addConnections } from "../utils/connectionSlice";
+import { addReequests } from "../utils/requestsSlice";
 
-const Connections = () => {
+const Requests = () => {
   const dispatch = useDispatch();
-  const connectionsData = useSelector((store) => store.connections);
-
-  const fetchConnections = async () => {
-    if (connectionsData) return;
+  const requests = useSelector((store) => store.requests);
+  const fetchRequests = async () => {
+    if (requests) return;
     try {
-      const res = await axios.get(BASE_URL + "/user/connections", {
+      const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
       });
-      dispatch(addConnections(res.data.data));
+      console.log(res.data.requests);
+      dispatch(addReequests(res.data.requests));
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    fetchConnections();
+    fetchRequests();
   }, []);
 
-  if (!connectionsData) return;
+  if (!requests) return;
 
-  if (connectionsData.length === 0) return <h1>No Connections Found!</h1>;
+  if (requests.length === 0) return <h1>No Requests Found!</h1>;
 
   return (
     <div className="text-center my-10">
-      <h1 className="font-bold text-white text-3xl">Connections</h1>
-      {connectionsData.map((connection) => {
+      <h1 className="font-bold text-white text-3xl">Connection Requests</h1>
+      {requests.map((request) => {
         const {
           _id,
           firstName,
@@ -41,10 +41,13 @@ const Connections = () => {
           gender,
           about,
           skills,
-        } = connection;
+        } = request.fromUserId;
 
         return (
-          <div className="p-4 m-4 bg-base-300 flex w-1/2 mx-auto" key={_id}>
+          <div
+            className="p-4 m-4 bg-base-300 flex w-2/3 mx-auto flex flex-row justify-between items-center"
+            key={_id}
+          >
             <div>
               <img
                 src={
@@ -61,6 +64,10 @@ const Connections = () => {
               </h2>
               <p>{about}</p>
             </div>
+            <div className="flex flex-row gap-4">
+              <button className="btn btn-primary">Reject</button>
+              <button className="btn btn-secondary">Accept</button>
+            </div>
           </div>
         );
       })}
@@ -68,4 +75,4 @@ const Connections = () => {
   );
 };
 
-export default Connections;
+export default Requests;

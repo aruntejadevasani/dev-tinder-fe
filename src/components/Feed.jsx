@@ -26,6 +26,8 @@ const Feed = () => {
     getFeed();
   }, []);
 
+  if (feedData?.length === 0) return;
+
   return (
     feedData && (
       <div>
