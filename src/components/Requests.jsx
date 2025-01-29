@@ -1,14 +1,14 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addReequests } from "../utils/requestsSlice";
+import { addReequests, removeRequest } from "../utils/requestsSlice";
 
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
+
   const fetchRequests = async () => {
-    if (requests) return;
     try {
       const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
@@ -20,13 +20,31 @@ const Requests = () => {
     }
   };
 
+  const reviewRequest = async (status, _id) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/request/review/" + status + "/" + _id,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeRequest(_id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchRequests();
   }, []);
 
   if (!requests) return;
 
-  if (requests.length === 0) return <h1>No Requests Found!</h1>;
+  if (requests.length === 0)
+    return (
+      <h1 className="font-bold text-white justify-center flex my-10">
+        No Requests Found!
+      </h1>
+    );
 
   return (
     <div className="text-center my-10">
@@ -65,8 +83,18 @@ const Requests = () => {
               <p>{about}</p>
             </div>
             <div className="flex flex-row gap-4">
-              <button className="btn btn-primary">Reject</button>
-              <button className="btn btn-secondary">Accept</button>
+              <button
+                className="btn btn-primary"
+                onClick={() => reviewRequest("rejected", request._id)}
+              >
+                Reject
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => reviewRequest("accepted", request._id)}
+              >
+                Accept
+              </button>
             </div>
           </div>
         );
